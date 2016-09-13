@@ -39,7 +39,9 @@ public class MainActivity extends Activity {
         productViewAdapter.registerActivity(this);
         productView.setAdapter(productViewAdapter);
 
+        // setup product query
         final ProductQuery query = new ProductQuery();
+        query.registerActivity(this);
 
         // query and assign products to the product view on editor finish button
         searchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {

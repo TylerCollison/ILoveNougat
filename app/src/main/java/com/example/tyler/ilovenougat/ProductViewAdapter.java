@@ -50,6 +50,11 @@ public class ProductViewAdapter extends RecyclerView.Adapter<ProductViewAdapter.
             productName = (TextView) itemView.findViewById(R.id.productName);
             viewButton = (Button) itemView.findViewById(R.id.viewButton);
             compareButton = (Button) itemView.findViewById(R.id.compareButton);
+
+            // setup the query
+            final ProductQuery query = new ProductQuery();
+            query.registerActivity(activityContext);
+
             // set the viewButton onClick listener to open the product view
             viewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -61,7 +66,6 @@ public class ProductViewAdapter extends RecyclerView.Adapter<ProductViewAdapter.
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProductQuery query = new ProductQuery();
                     query.displayCheapestMatch(SIX_PM_ENDPOINT +
                             products.get(getAdapterPosition()).getAttribute("productName") +
                             SIX_PM_KEY, products.get(getAdapterPosition()), view);
@@ -70,7 +74,6 @@ public class ProductViewAdapter extends RecyclerView.Adapter<ProductViewAdapter.
             compareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ProductQuery query = new ProductQuery();
                     query.displayCheapestMatch(SIX_PM_ENDPOINT +
                             products.get(getAdapterPosition()).getAttribute("productName") +
                             SIX_PM_KEY, products.get(getAdapterPosition()), v);

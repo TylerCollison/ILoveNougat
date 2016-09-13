@@ -1,9 +1,13 @@
 package com.example.tyler.ilovenougat;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.util.JsonReader;
+import android.util.Log;
 import android.view.View;
 
 import java.io.IOException;
@@ -18,6 +22,9 @@ import java.util.List;
  * Created by Tyler Collison on 9/9/2016.
  */
 public class ProductQuery extends Activity {
+
+    // Store the activity context that manages this product query
+    private Context activityContext;
 
     // store the last started product display thread
     private AsyncDisplayProductsQuery runningTask = new AsyncDisplayProductsQuery();
@@ -60,6 +67,19 @@ public class ProductQuery extends Activity {
         AsyncGetCheapestProductQuery query = new AsyncGetCheapestProductQuery();
         Object[] parameters = {url, product, view};
         query.execute(parameters);
+    }
+
+    /**
+     * @param activity the activity that manages this product query
+     *
+     * Registers the @activity with this product query
+     *
+     * @requires activity is not null
+     *
+     * @ensures @activity is registered with this product query
+     */
+    public void registerActivity (Context activity) {
+        activityContext = activity;
     }
 
     private class AsyncDisplayProductsQuery extends AsyncTask<Object, Void, Void> {
@@ -125,11 +145,16 @@ public class ProductQuery extends Activity {
             Product compareProduct = (Product) objects[1];
             View view = (View)objects[2];
             // get the cheapest matching product
-            Product cheapestMatch = findCheapestMatch(products, compareProduct);
+            final Product cheapestMatch = findCheapestMatch(products, compareProduct);
             // Determine whether the cheapest match is an empty product
             if (!cheapestMatch.isEmpty()) {
                 Snackbar.make(view, "Available from " + cheapestMatch.getAttribute("price") +
-                    " at 6pm.com!", Snackbar.LENGTH_LONG).show();
+                    " at 6pm.com!", Snackbar.LENGTH_LONG).setAction("View", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openProductView(cheapestMatch.getAttribute("productUrl"));
+                    }
+                }).show();
             } else {
                 Snackbar.make(view, "Best price on Zappos.com!", Snackbar.LENGTH_LONG).show();
             }
@@ -257,6 +282,20 @@ public class ProductQuery extends Activity {
             e.printStackTrace();
         }
         return product;
+    }
+
+    /**
+     * @param productURL the url of the product to be displayed in the product view
+     *
+     * Opens the product view activity for the product corresponding to @productURL
+     */
+    private void openProductView (String productURL) {
+        Intent productViewIntent = new Intent(activityContext, ProductView.class);
+        // store the productURL as intent data
+        Uri data = Uri.parse(productURL);
+        productViewIntent.setData(data);
+        // open the product view activity
+        activityContext.startActivity(productViewIntent);
     }
 
 }
